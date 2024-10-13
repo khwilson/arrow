@@ -494,8 +494,10 @@ TEST_F(TestSumKernelRoundOff, Basics) {
 }
 
 TEST(TestDecimalSumKernel, SimpleSum) {
-  std::vector<std::shared_ptr<DataType>> init_types = {decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
-  std::vector<std::shared_ptr<DataType>> out_types = {decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
+  std::vector<std::shared_ptr<DataType>> init_types = {
+      decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
+  std::vector<std::shared_ptr<DataType>> out_types = {
+      decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
 
   for (size_t i = 0; i < init_types.size(); ++i) {
     auto& ty = init_types[i];
@@ -541,12 +543,14 @@ TEST(TestDecimalSumKernel, SimpleSum) {
 }
 
 TEST(TestDecimalSumKernel, ScalarAggregateOptions) {
-  std::vector<std::shared_ptr<DataType>> init_types = {decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
-  std::vector<std::shared_ptr<DataType>> out_types = {decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
+  std::vector<std::shared_ptr<DataType>> init_types = {
+      decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
+  std::vector<std::shared_ptr<DataType>> out_types = {
+      decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
 
   for (size_t i = 0; i < init_types.size(); ++i) {
     auto& ty = init_types[i];
-    auto& out_ty = out_types[i ];
+    auto& out_ty = out_types[i];
 
     Datum null = ScalarFromJSON(out_ty, R"(null)");
     Datum zero = ScalarFromJSON(out_ty, R"("0.00")");
@@ -723,12 +727,14 @@ TYPED_TEST(TestNumericProductKernel, ScalarAggregateOptions) {
 }
 
 TEST(TestDecimalProductKernel, SimpleProduct) {
-  std::vector<std::shared_ptr<DataType>> init_types = {decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
-  std::vector<std::shared_ptr<DataType>> out_types = {decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
+  std::vector<std::shared_ptr<DataType>> init_types = {
+      decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
+  std::vector<std::shared_ptr<DataType>> out_types = {
+      decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
 
   for (size_t i = 0; i < init_types.size(); ++i) {
     auto& ty = init_types[i];
-    auto& out_ty = out_types[i ];
+    auto& out_ty = out_types[i];
 
     Datum null = ScalarFromJSON(out_ty, R"(null)");
 
@@ -754,7 +760,8 @@ TEST(TestDecimalProductKernel, SimpleProduct) {
     EXPECT_THAT(Product(ArrayFromJSON(ty, R"([null])"), options),
                 ResultWith(ScalarFromJSON(out_ty, R"("1.00")")));
     chunks = ChunkedArrayFromJSON(ty, {});
-    EXPECT_THAT(Product(chunks, options), ResultWith(ScalarFromJSON(out_ty, R"("1.00")")));
+    EXPECT_THAT(Product(chunks, options),
+                ResultWith(ScalarFromJSON(out_ty, R"("1.00")")));
 
     EXPECT_THAT(Product(ArrayFromJSON(
                             ty, R"(["1.00", null, "-3.00", null, "3.00", null, "7.00"])"),
@@ -768,12 +775,14 @@ TEST(TestDecimalProductKernel, SimpleProduct) {
 }
 
 TEST(TestDecimalProductKernel, ScalarAggregateOptions) {
-  std::vector<std::shared_ptr<DataType>> init_types = {decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
-  std::vector<std::shared_ptr<DataType>> out_types = {decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
+  std::vector<std::shared_ptr<DataType>> init_types = {
+      decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
+  std::vector<std::shared_ptr<DataType>> out_types = {
+      decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
 
   for (size_t i = 0; i < init_types.size(); ++i) {
     auto& ty = init_types[i];
-    auto& out_ty = out_types[i ];
+    auto& out_ty = out_types[i];
 
     Datum null = ScalarFromJSON(out_ty, R"(null)");
     Datum one = ScalarFromJSON(out_ty, R"("1.00")");
@@ -1360,8 +1369,10 @@ TYPED_TEST(TestRandomNumericMeanKernel, RandomArrayMeanOverflow) {
 TEST(TestDecimalMeanKernel, SimpleMean) {
   ScalarAggregateOptions options(/*skip_nulls=*/true, /*min_count=*/0);
 
-  std::vector<std::shared_ptr<DataType>> init_types = {decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
-  std::vector<std::shared_ptr<DataType>> out_types = {decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
+  std::vector<std::shared_ptr<DataType>> init_types = {
+      decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
+  std::vector<std::shared_ptr<DataType>> out_types = {
+      decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
 
   for (size_t i = 0; i < init_types.size(); ++i) {
     auto& ty = init_types[i];
@@ -1421,8 +1432,9 @@ TEST(TestDecimalMeanKernel, SimpleMean) {
   }
 
   // TODO: Currently, casts are not implemented for decimal32/64 so we ignore that for now
-  // init_types = {decimal32(3, -2), decimal64(3, -2), decimal128(3, -2), decimal256(3, -2)};
-  // out_types = {decimal32(9, -2), decimal64(18, -2), decimal128(38, -2), decimal256(76, -2)};
+  // init_types = {decimal32(3, -2), decimal64(3, -2), decimal128(3, -2), decimal256(3,
+  // -2)}; out_types = {decimal32(9, -2), decimal64(18, -2), decimal128(38, -2),
+  // decimal256(76, -2)};
 
   init_types = {decimal128(3, -2), decimal256(3, -2)};
   out_types = {decimal128(38, -2), decimal256(76, -2)};
@@ -1463,8 +1475,10 @@ TEST(TestDecimalMeanKernel, SimpleMean) {
 }
 
 TEST(TestDecimalMeanKernel, ScalarAggregateOptions) {
-  std::vector<std::shared_ptr<DataType>> init_types = {decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
-  std::vector<std::shared_ptr<DataType>> out_types = {decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
+  std::vector<std::shared_ptr<DataType>> init_types = {
+      decimal32(3, 2), decimal64(3, 2), decimal128(3, 2), decimal256(3, 2)};
+  std::vector<std::shared_ptr<DataType>> out_types = {
+      decimal32(9, 2), decimal64(18, 2), decimal128(38, 2), decimal256(76, 2)};
 
   for (size_t i = 0; i < init_types.size(); ++i) {
     auto& ty = init_types[i];
