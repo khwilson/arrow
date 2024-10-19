@@ -186,18 +186,6 @@ struct Sinh {
   }
 };
 
-struct SinhChecked {
-  template <typename T, typename Arg0>
-  static enable_if_floating_value<Arg0, T> Call(KernelContext*, Arg0 val, Status* st) {
-    static_assert(std::is_same<T, Arg0>::value, "");
-    if (ARROW_PREDICT_FALSE(std::isinf(val))) {
-      *st = Status::Invalid("domain error");
-      return val;
-    }
-    return std::sinh(val);
-  }
-};
-
 struct Cos {
   template <typename T, typename Arg0>
   static enable_if_floating_value<Arg0, T> Call(KernelContext*, Arg0 val, Status*) {
@@ -222,18 +210,6 @@ struct Cosh {
   template <typename T, typename Arg0>
   static enable_if_floating_value<Arg0, T> Call(KernelContext*, Arg0 val, Status*) {
     static_assert(std::is_same<T, Arg0>::value, "");
-    return std::cosh(val);
-  }
-};
-
-struct CoshChecked {
-  template <typename T, typename Arg0>
-  static enable_if_floating_value<Arg0, T> Call(KernelContext*, Arg0 val, Status* st) {
-    static_assert(std::is_same<T, Arg0>::value, "");
-    if (ARROW_PREDICT_FALSE(std::isinf(val))) {
-      *st = Status::Invalid("domain error");
-      return val;
-    }
     return std::cosh(val);
   }
 };
@@ -263,18 +239,6 @@ struct Tanh {
   template <typename T, typename Arg0>
   static enable_if_floating_value<Arg0, T> Call(KernelContext*, Arg0 val, Status*) {
     static_assert(std::is_same<T, Arg0>::value, "");
-    return std::tanh(val);
-  }
-};
-
-struct TanhChecked {
-  template <typename T, typename Arg0>
-  static enable_if_floating_value<Arg0, T> Call(KernelContext*, Arg0 val, Status* st) {
-    static_assert(std::is_same<T, Arg0>::value, "");
-    if (ARROW_PREDICT_FALSE(std::isinf(val))) {
-      *st = Status::Invalid("domain error");
-      return val;
-    }
     return std::tanh(val);
   }
 };
@@ -380,7 +344,7 @@ struct Atanh {
   template <typename T, typename Arg0>
   static enable_if_floating_value<Arg0, T> Call(KernelContext*, Arg0 val, Status*) {
     static_assert(std::is_same<T, Arg0>::value, "");
-    if (ARROW_PREDICT_FALSE((val <= -1.0 || val >= 1.0))) {
+    if (ARROW_PREDICT_FALSE((val < -1.0 || val > 1.0))) {
       return std::numeric_limits<T>::quiet_NaN();
     }
     return std::atanh(val);
@@ -391,7 +355,7 @@ struct AtanhChecked {
   template <typename T, typename Arg0>
   static enable_if_floating_value<Arg0, T> Call(KernelContext*, Arg0 val, Status* st) {
     static_assert(std::is_same<T, Arg0>::value, "");
-    if (ARROW_PREDICT_FALSE((val <= -1.0 || val >= 1.0))) {
+    if (ARROW_PREDICT_FALSE((val < -1.0 || val > 1.0))) {
       *st = Status::Invalid("domain error");
       return val;
     }
@@ -1300,14 +1264,9 @@ const FunctionDoc sin_checked_doc{"Compute the sine",
                                   {"x"}};
 
 const FunctionDoc sinh_doc{"Compute the hyperblic sine",
-                          ("NaN is returned for invalid input values;\n"
-                           "to raise an error instead, see \"sinh_checked\"."),
+(""),
                           {"x"}};
 
-const FunctionDoc sinh_checked_doc{"Compute the hyperbolic sine",
-                                  ("Invalid input values raise an error;\n"
-                                   "to return NaN instead, see \"sinh\"."),
-                                  {"x"}};
 
 const FunctionDoc cos_doc{"Compute the cosine",
                           ("NaN is returned for invalid input values;\n"
@@ -1320,14 +1279,8 @@ const FunctionDoc cos_checked_doc{"Compute the cosine",
                                   {"x"}};
 
 const FunctionDoc cosh_doc{"Compute the hyperbolic cosine",
-                          ("NaN is returned for invalid input values;\n"
-                           "to raise an error instead, see \"cosh_checked\"."),
+(""),
                           {"x"}};
-
-const FunctionDoc cosh_checked_doc{"Compute the hyperbolic cosine",
-                                  ("Infinite values raise an error;\n"
-                                   "to return NaN instead, see \"cosh\"."),
-                                  {"x"}};
 
 const FunctionDoc tan_doc{"Compute the tangent",
                           ("NaN is returned for invalid input values;\n"
@@ -1340,14 +1293,8 @@ const FunctionDoc tan_checked_doc{"Compute the tangent",
                                   {"x"}};
 
 const FunctionDoc tanh_doc{"Compute the hyperbolic tangent",
-                          ("NaN is returned for invalid input values;\n"
-                           "to raise an error instead, see \"tanh_checked\"."),
+                           (""),
                           {"x"}};
-
-const FunctionDoc tanh_checked_doc{"Compute the hyperbolic tangent",
-                                  ("Infinite values raise an error;\n"
-                                   "to return NaN instead, see \"tanh\"."),
-                                  {"x"}};
 
 const FunctionDoc asin_doc{"Compute the inverse sine",
                            ("NaN is returned for invalid input values;\n"
@@ -1364,11 +1311,6 @@ const FunctionDoc asinh_doc{"Compute the inverse hyperbolic sine",
                            ("NaN is returned for invalid input values;\n"
                             "to raise an error instead, see \"asinh_checked\"."),
                            {"x"}};
-
-const FunctionDoc asinh_checked_doc{"Compute the inverse hyperbolic sine",
-                                   ("Invalid input values raise an error;\n"
-                                    "to return NaN instead, see \"asinh\"."),
-                                   {"x"}};
 
 const FunctionDoc acos_doc{"Compute the inverse cosine",
                            ("NaN is returned for invalid input values;\n"
@@ -1872,10 +1814,6 @@ void RegisterScalarArithmetic(FunctionRegistry* registry) {
   auto sinh = MakeUnaryArithmeticFunctionFloatingPoint<Sinh>("sinh", sinh_doc);
   DCHECK_OK(registry->AddFunction(std::move(sinh)));
 
-  auto sinh_checked = MakeUnaryArithmeticFunctionFloatingPointNotNull<SinhChecked>(
-      "sinh_checked", sinh_checked_doc);
-  DCHECK_OK(registry->AddFunction(std::move(sinh_checked)));
-
   auto cos = MakeUnaryArithmeticFunctionFloatingPoint<Cos>("cos", cos_doc);
   DCHECK_OK(registry->AddFunction(std::move(cos)));
 
@@ -1885,10 +1823,6 @@ void RegisterScalarArithmetic(FunctionRegistry* registry) {
 
   auto cosh = MakeUnaryArithmeticFunctionFloatingPoint<Cosh>("cosh", cosh_doc);
   DCHECK_OK(registry->AddFunction(std::move(cosh)));
-
-  auto cosh_checked = MakeUnaryArithmeticFunctionFloatingPointNotNull<CoshChecked>(
-      "cosh_checked", cosh_checked_doc);
-  DCHECK_OK(registry->AddFunction(std::move(cosh_checked)));
 
   auto tan = MakeUnaryArithmeticFunctionFloatingPoint<Tan>("tan", tan_doc);
   DCHECK_OK(registry->AddFunction(std::move(tan)));
@@ -1900,10 +1834,6 @@ void RegisterScalarArithmetic(FunctionRegistry* registry) {
   auto tanh = MakeUnaryArithmeticFunctionFloatingPoint<Tanh>("tanh", tanh_doc);
   DCHECK_OK(registry->AddFunction(std::move(tanh)));
 
-  auto tanh_checked = MakeUnaryArithmeticFunctionFloatingPointNotNull<TanhChecked>(
-      "tanh_checked", tanh_checked_doc);
-  DCHECK_OK(registry->AddFunction(std::move(tanh_checked)));
-
   auto asin = MakeUnaryArithmeticFunctionFloatingPoint<Asin>("asin", asin_doc);
   DCHECK_OK(registry->AddFunction(std::move(asin)));
 
@@ -1913,10 +1843,6 @@ void RegisterScalarArithmetic(FunctionRegistry* registry) {
 
   auto asinh = MakeUnaryArithmeticFunctionFloatingPoint<Asinh>("asinh", asinh_doc);
   DCHECK_OK(registry->AddFunction(std::move(asinh)));
-
-  auto asinh_checked = MakeUnaryArithmeticFunctionFloatingPointNotNull<AsinhChecked>(
-      "asinh_checked", asinh_checked_doc);
-  DCHECK_OK(registry->AddFunction(std::move(asinh_checked)));
 
   auto acos = MakeUnaryArithmeticFunctionFloatingPoint<Acos>("acos", acos_doc);
   DCHECK_OK(registry->AddFunction(std::move(acos)));
